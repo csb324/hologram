@@ -69,7 +69,7 @@ eos
 
   context '#get_hash' do
     let(:meta) do
-      { name: 'foo', categories: ['bar'], title: 'baz', parent: 'pop' }
+      { name: 'foo', categories: ['bar'], title: 'baz', parent: 'pop', md: 'blah' }
     end
 
     it 'returns a hash of meta info' do

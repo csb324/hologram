@@ -39,7 +39,8 @@ module Hologram
       {name: @name,
        parent: @parent,
        categories: @categories,
-       title: @title
+       title: @title,
+       md: @markdown
       }
     end
 

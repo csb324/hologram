@@ -1,4 +1,6 @@
 require 'hologram/link_helper'
+require 'pry'
+require 'pry-byebug'
 
 module Hologram
   class DocBuilder
@@ -195,6 +197,8 @@ module Hologram
           tpl_vars.set_args({title: title, file_name: file_name, blocks: page[:blocks]})
           if page.has_key?(:erb)
             write_erb(file_name, page[:erb], tpl_vars.get_binding)
+          elsif !page[:blocks].empty?
+            write_page_from_blocks(file_name, page[:blocks], markdown, tpl_vars.get_binding)              
           else
             write_page(file_name, markdown.render(page[:md]), tpl_vars.get_binding)
           end
@@ -245,6 +249,32 @@ module Hologram
       fh.write(footer_erb.result(binding)) if footer_erb
     ensure
       fh.close
+    end
+
+    def write_page_from_blocks(file_name, blocks, markdown, binding)
+      fh = get_fh(output_dir, file_name)
+      fh.write(header_erb.result(binding)) if header_erb
+
+      blocks.each do |block|
+        # markdown.render(block)
+        fh.write(openContainer(block))
+        fh.write(markdown.render(block[:md]))
+        fh.write(closeContainer(block))
+      end
+  
+      # fh.write(body)
+      fh.write(footer_erb.result(binding)) if footer_erb
+
+    ensure 
+      fh.close
+    end
+
+    def openContainer(block) 
+      "\n<div class=\"block block--#{block[:name]} block--level-#{block[:level]}\">\n<h#{block[:level]} id=\"#{block[:name]}\" class=\"styleguide\">#{block[:title]}</h#{block[:level]}>\n"
+    end
+
+    def closeContainer(block)
+      "</div>\n"      
     end
 
     def set_header_footer
